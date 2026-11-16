@@ -1,0 +1,9 @@
+{
+  "JudgeBackend": "gemini",
+  "AllowClassifierOverride": "true",
+  "SemanticCacheEnabled": "false",
+  "VectorSearchIndexEndpointUrl": "https://{ENDPOINT_ID}.us-central1-{PROJECT_NUMBER}.vdb.vertexai.goog/v1/projects/{PROJECT_NUMBER}/locations/us-central1/indexEndpoints/{INDEX_ENDPOINT_ID}:findNeighbors",
+  "VectorSearchUpsertUrl": "https://us-central1-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/us-central1/indexes/{INDEX_ID}:upsertDatapoints",
+  "VectorSearchDeployedIndexId": "router_lab_semantic_cache",
+  "SemanticCacheDistanceMeasure": "DOT_PRODUCT_DISTANCE"
+}

@@ -1,0 +1,78 @@
+# ==============================================================================
+# Feature: Stage 05 Automatic Vertex-to-Vertex Circuit Breaker & Failover
+# When a primary Vertex AI Model Garden endpoint returns HTTP 429 (Quota /
+# Provisioned Throughput saturation) or 5xx, automatically fails over to a
+# secondary Vertex AI model (gemini-3.1-pro-preview) without breaking the
+# coding agent session. Never triggers on 400 or 404 client errors.
+# ==============================================================================
+defaultParameters:
+  - name: GCPProjectId
+    value: YOUR_PROJECT_ID
+  - name: FallbackVertexModel
+    value: google/gemini-3.1-pro-preview
+
+targets:
+  - name: default
+    postFlow:
+      response:
+        - name: RF-TriggerFallbackOnQuotaOrServerError
+          condition: response.status.code = 429 or response.status.code >= 500
+    faultRules:
+      - name: VertexModelGardenFailoverRule
+        condition: response.status.code = 429 or response.status.code >= 500
+        steps:
+          - name: JS-PrepareVertexFallbackPayload
+          - name: SC-VertexFallbackCallout
+          - name: AM-PromoteFallbackResponse
+          - name: JS-TransformResponseAndCalculateCost
+
+steps:
+  - name: RF-TriggerFallbackOnQuotaOrServerError
+    type: RaiseFault
+    properties:
+      statusCode: 503
+      reasonPhrase: Upstream Quota Or Server Error Triggering Fallback
+
+  - name: JS-PrepareVertexFallbackPayload
+    type: JavaScript
+    properties:
+      resourceURL: jsc://prepareVertexFallbackPayload.js
+      timeLimit: 400
+
+  - name: SC-VertexFallbackCallout
+    type: ServiceCallout
+    properties:
+      timeout: 120000
+      request:
+        variable: vertexFallbackRequest
+        set:
+          verb: POST
+          headers:
+            Content-Type: application/json
+          payload:
+            contentType: application/json
+            content: "{vertex_fallback_payload}"
+      response: vertexFallbackResponse
+      httpTargetConnection:
+        url: "https://aiplatform.googleapis.com/v1/projects/{GCPProjectId}/locations/global/publishers/google/models/gemini-3.1-pro-preview:generateContent"
+        authentication:
+          googleAccessToken:
+            scopes:
+              scope: https://www.googleapis.com/auth/cloud-platform
+
+  - name: AM-PromoteFallbackResponse
+    type: AssignMessage
+    properties:
+      set:
+        statusCode: 200
+        headers:
+          Content-Type: "application/json"
+          X-Vertex-Fallback-Triggered: "true"
+          X-Apigee-Fallback-Triggered: "true"
+          X-Apigee-Fallback-Model: "{FallbackVertexModel}"
+        payload: "{vertexFallbackResponse.content}"
+      assignVariable:
+        - name: ai.fallbackUsed
+          value: "true"
+        - name: ai.targetVertexModel
+          value: "{FallbackVertexModel}"

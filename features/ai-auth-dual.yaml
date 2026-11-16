@@ -1,0 +1,92 @@
+# ==============================================================================
+# Feature: Dual-Mode Enterprise Authentication (Apigee API Key OR Google OIDC)
+# Maps both CLI (gcloud ADC OIDC) and Desktop GUI (API Key) to the same
+# Apigee Developer, Team/Cost-Center, and API Product <LLMTokenQuota>.
+# Accepts both x-api-key and Authorization: Bearer <key-or-jwt>.
+# ==============================================================================
+defaultParameters:
+  - name: GoogleOidcJwksUri
+    value: https://www.googleapis.com/oauth2/v3/certs
+  - name: GoogleOidcIssuer
+    value: https://accounts.google.com
+  - name: GoogleOidcAudience
+    value: https://ai-gw.internal.example.com
+
+endpoints:
+  - name: default
+    preFlow:
+      request:
+        - name: JS-ExtractAuthMode
+          condition: request.verb != "OPTIONS"
+        - name: VA-VerifyApiKey
+          condition: request.verb != "OPTIONS" and auth.mode = "apikey"
+        - name: VJ-VerifyGoogleOIDC
+          condition: request.verb != "OPTIONS" and auth.mode = "oidc"
+        - name: AE-LookupDeveloperByEmail
+          condition: request.verb != "OPTIONS" and auth.mode = "oidc"
+        - name: JS-FinalizeAuthAttributes
+          condition: request.verb != "OPTIONS" and (auth.mode = "apikey" or auth.mode = "oidc")
+        - name: RF-Unauthorized
+          condition: request.verb != "OPTIONS" and auth.verified != "true"
+        - name: AM-RemoveClientCredentials
+
+steps:
+  - name: JS-ExtractAuthMode
+    type: JavaScript
+    properties:
+      resourceURL: jsc://extractAuthMode.js
+      timeLimit: 200
+
+  - name: VA-VerifyApiKey
+    type: VerifyAPIKey
+    properties:
+      apiKey: auth.extracted_key
+
+  - name: VJ-VerifyGoogleOIDC
+    type: VerifyJWT
+    properties:
+      algorithm: RS256
+      source: auth.extracted_jwt
+      ignoreUnresolvedVariables: false
+      publicKey:
+        jwksUri: "{GoogleOidcJwksUri}"
+      issuer: "{GoogleOidcIssuer}"
+      audience: "{GoogleOidcAudience}"
+      subject: auth.oidc_sub
+
+  - name: AE-LookupDeveloperByEmail
+    type: AccessEntity
+    properties:
+      entityType: developer
+      entityIdentifier: jwt.VJ-VerifyGoogleOIDC.decoded.claim.email
+      secondaryIdentifierType: developeremail
+
+  - name: JS-FinalizeAuthAttributes
+    type: JavaScript
+    properties:
+      resourceURL: jsc://extractAuthMode.js
+      timeLimit: 200
+
+  - name: RF-Unauthorized
+    type: RaiseFault
+    properties:
+      statusCode: 401
+      reasonPhrase: Unauthorized
+      headers:
+        WWW-Authenticate: 'Bearer realm="apigee-coding-gateway"'
+        X-Content-Type-Options: "nosniff"
+      payload:
+        contentType: application/json
+        content: |
+          {"error":{"type":"authentication_error","message":"Valid Apigee API Key or Google Cloud OIDC Identity Token is required."}}
+
+  - name: AM-RemoveClientCredentials
+    type: AssignMessage
+    properties:
+      remove:
+        headers:
+          - x-api-key
+          - x-goog-api-key
+          - Authorization
+          - Accept-Encoding
+          - accept-encoding

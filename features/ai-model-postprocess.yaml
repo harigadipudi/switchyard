@@ -1,0 +1,116 @@
+# ==============================================================================
+# Feature: Cross-Protocol Response Serialization & FinOps Chargeback Analytics
+# Converts Vertex AI responses back to the caller's native coding harness schema
+# (/v1/messages for Claude Code, /v1beta/models for Antigravity, /v1/responses
+# for Codex) and captures developer, team, harness, model, tokens, USD cost,
+# and Routing & Frontier Overkill Transparency into Apigee DataCapture +
+# zero-latency PostClientFlow Cloud Logging (covering both Unary & SSE Streaming).
+# ==============================================================================
+endpoints:
+  - name: default
+    postFlow:
+      response:
+        # A semantic cache hit already holds a response in the caller's wire format.
+        - name: JS-TransformResponseAndCalculateCost
+          condition: request.verb != "OPTIONS" and ai.isAntigravityTelemetry != "true" and SemanticCacheLookup.SCL-LookupPrompt.cache_hit != true
+        - name: DC-CaptureFinOpsMetrics
+          condition: request.verb != "OPTIONS" and ai.totalTokenCount != null
+    eventFlow:
+      response:
+        - name: JS-TransformStreamEvent
+          condition: ai.isAntigravityTelemetry != "true"
+        - name: DC-CaptureFinOpsMetrics
+          condition: ai.isAntigravityTelemetry != "true" and ai.finopsStreamReady = "true"
+    postClientFlow:
+      response:
+        - name: ML-EmitCloudFinOpsLog
+
+steps:
+  - name: JS-TransformResponseAndCalculateCost
+    type: JavaScript
+    properties:
+      resourceURL: jsc://transformResponseAndCost.js
+      timeLimit: 2000
+
+  - name: JS-TransformStreamEvent
+    type: JavaScript
+    properties:
+      resourceURL: jsc://transformStreamEvent.js
+      timeLimit: 1000
+
+  - name: DC-CaptureFinOpsMetrics
+    type: DataCapture
+    properties:
+      ignoreUnresolvedVariables: true
+      captures:
+        - dataCollector: dc_developer_email
+          ref: ai.developerEmail
+        - dataCollector: dc_team_name
+          ref: ai.teamName
+        - dataCollector: dc_cost_center
+          ref: ai.costCenter
+        - dataCollector: dc_coding_harness
+          ref: ai.codingHarness
+        - dataCollector: dc_requested_model
+          ref: ai.requestedModel
+        - dataCollector: dc_routed_model
+          ref: ai.routedModel
+        - dataCollector: dc_target_vertex_model
+          ref: ai.targetVertexModel
+        - dataCollector: dc_routing_tier
+          ref: ai.routingTier
+        - dataCollector: dc_prompt_tokens
+          ref: ai.promptTokenCount
+        - dataCollector: dc_completion_tokens
+          ref: ai.completionTokenCount
+        - dataCollector: dc_cached_tokens
+          ref: ai.cachedTokens
+        - dataCollector: dc_total_tokens
+          ref: ai.totalTokenCount
+        - dataCollector: dc_estimated_cost_usd
+          ref: ai.estimatedCostUsd
+        - dataCollector: dc_frontier_baseline_cost_usd
+          ref: ai.frontierBaselineCostUsd
+        - dataCollector: dc_routing_savings_usd
+          ref: ai.routingSavingsUsd
+        - dataCollector: dc_funding_pool
+          ref: ai.fundingPool
+        - dataCollector: dc_fallback_used
+          ref: ai.fallbackUsed
+        - dataCollector: dc_routing_mode
+          ref: ai.routingMode
+        - dataCollector: dc_recommended_tier
+          ref: ai.recommendedTier
+        - dataCollector: dc_avoidable_frontier_spend_usd
+          ref: ai.avoidableFrontierSpendUsd
+        - dataCollector: dc_workload_category
+          ref: ai.workloadCategory
+        - dataCollector: dc_cache_hit_rate_pct
+          ref: ai.cacheHitRatePct
+        - dataCollector: dc_session_id
+          ref: ai.sessionId
+        - dataCollector: dc_project_name
+          ref: ai.projectName
+        - dataCollector: dc_gateway_key_name
+          ref: ai.gatewayKeyName
+        - dataCollector: dc_credential_type
+          ref: ai.credentialType
+        - dataCollector: dc_net_cash_cost_usd
+          ref: ai.netCashCostUsd
+        - dataCollector: dc_total_latency_ms
+          ref: ai.totalLatencyMs
+        - dataCollector: dc_ttft_ms
+          ref: ai.ttftMs
+        - dataCollector: dc_ingestion_mode
+          ref: ai.finopsIngestionMode
+
+  - name: ML-EmitCloudFinOpsLog
+    type: MessageLogging
+    properties:
+      logName: projects/{GCPProjectId}/logs/apigee-ai-finops
+      messageContentType: application/json
+      # No default value: a default containing braces, as in {ai.finopsLogPayload:{}}, is not
+      # read as a variable reference at all, and Cloud Logging received the literal text.
+      message: "{ai.finopsLogPayload}"
+      resourceType: global
+      logLevel: INFO

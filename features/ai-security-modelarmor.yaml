@@ -1,0 +1,36 @@
+# ==============================================================================
+# Feature: Native Google Cloud Model Armor (<SanitizeUserPrompt> & Response)
+# Inspects coding prompts and model outputs for Prompt Injection, Jailbreak,
+# Malicious URLs, and Sensitive Data (Secrets / PII / DLP) before/after Vertex AI.
+# ==============================================================================
+defaultParameters:
+  - name: ModelArmorTemplatePath
+    value: projects/YOUR_PROJECT_ID/locations/us-central1/templates/coding-agent-armor
+
+endpoints:
+  - name: default
+    preFlow:
+      request:
+        - name: SUP-ValidatePrompt
+          after: RF-ModelForbidden
+          condition: request.verb != "OPTIONS" and ai.extractedPrompt != null and ai.extractedPrompt != ""
+    postFlow:
+      response:
+        - name: SMR-ValidateResponse
+          condition: request.verb != "OPTIONS" and ai.extractedResponseText != null and ai.extractedResponseText != "" and SemanticCacheLookup.SCL-LookupPrompt.cache_hit != true
+
+steps:
+  - name: SUP-ValidatePrompt
+    type: SanitizeUserPrompt
+    properties:
+      ignoreUnresolvedVariables: true
+      modelArmorTemplateName: "{ModelArmorTemplatePath}"
+      userPromptSource: "{ai.extractedPrompt}"
+
+  - name: SMR-ValidateResponse
+    type: SanitizeModelResponse
+    properties:
+      ignoreUnresolvedVariables: true
+      modelArmorTemplateName: "{ModelArmorTemplatePath}"
+      modelResponseSource: "{ai.extractedResponseText}"
+      userPromptSource: "{ai.extractedPrompt}"

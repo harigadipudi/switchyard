@@ -1,0 +1,60 @@
+{"id": "h1-01", "tier": "tier1-fast", "prompt": "whats the diff between merge and rebase again"}
+{"id": "h1-02", "tier": "tier1-fast", "prompt": "which node version am i on"}
+{"id": "h1-03", "tier": "tier1-fast", "prompt": "tar flags to extract a .tar.gz?"}
+{"id": "h1-04", "tier": "tier1-fast", "prompt": "is 0.1 + 0.2 == 0.3 in js"}
+{"id": "h1-05", "tier": "tier1-fast", "prompt": "ok cool thx"}
+{"id": "h1-06", "tier": "tier1-fast", "prompt": "what does EADDRINUSE mean"}
+{"id": "h1-07", "tier": "tier1-fast", "prompt": "where does pip put packages on mac"}
+{"id": "h1-08", "tier": "tier1-fast", "prompt": "what's a 502 vs a 504"}
+{"id": "h1-09", "tier": "tier1-fast", "prompt": "run the tests"}
+{"id": "h1-10", "tier": "tier1-fast", "prompt": "how many lines is main.go"}
+{"id": "h1-11", "tier": "tier1-fast", "prompt": "tl;dr what is a mutex"}
+{"id": "h1-12", "tier": "tier1-fast", "prompt": "does postgres support upsert"}
+{"id": "h1-13", "tier": "tier1-fast", "prompt": "what does the ?? operator do in typescript"}
+{"id": "h1-14", "tier": "tier1-fast", "prompt": "show git log for the last 3 commits"}
+{"id": "h1-15", "tier": "tier1-fast", "prompt": "what timezone does cron use by default"}
+{"id": "h4-01", "tier": "tier4-open", "prompt": "need a quick py func to chunk a list into batches of n"}
+{"id": "h4-02", "tier": "tier4-open", "prompt": "regex for iso 8601 dates pls"}
+{"id": "h4-03", "tier": "tier4-open", "prompt": "bash snippet: loop over *.json and pretty print each with jq"}
+{"id": "h4-04", "tier": "tier4-open", "prompt": "write me a k8s deployment yaml for nginx, 3 replicas, port 80"}
+{"id": "h4-05", "tier": "tier4-open", "prompt": "sql: count orders per day for the last 30 days"}
+{"id": "h4-06", "tier": "tier4-open", "prompt": "ts type guard that checks if a value is a non-empty string array"}
+{"id": "h4-07", "tier": "tier4-open", "prompt": "unit test for a slugify(title) function in vitest"}
+{"id": "h4-08", "tier": "tier4-open", "prompt": "golang http handler that returns {\"status\":\"ok\"} as json"}
+{"id": "h4-09", "tier": "tier4-open", "prompt": "python one-off script to rename all .jpeg files in a folder to .jpg"}
+{"id": "h4-10", "tier": "tier4-open", "prompt": "solve x^2 - 5x + 6 = 0 and show the working"}
+{"id": "h4-11", "tier": "tier4-open", "prompt": "java record for Money with currency + amount and a plus() method"}
+{"id": "h4-12", "tier": "tier4-open", "prompt": "docker-compose file with postgres 16 and redis, default ports"}
+{"id": "h4-13", "tier": "tier4-open", "prompt": "rust fn that parses \"key=value;key2=value2\" into a HashMap"}
+{"id": "h4-14", "tier": "tier4-open", "prompt": "css to center a div both ways with flexbox"}
+{"id": "h4-15", "tier": "tier4-open", "prompt": "write a .gitignore for a python + node monorepo"}
+{"id": "h2-01", "tier": "tier2-daily", "prompt": "login is broken on staging since the last deploy - `401 invalid audience` from /api/session. figure out what changed in auth/ and fix it"}
+{"id": "h2-02", "tier": "tier2-daily", "prompt": "tests in pkg/billing started failing after i bumped stripe-go, can you sort it out"}
+{"id": "h2-03", "tier": "tier2-daily", "prompt": "the retry wrapper in http_client.py swallows the original exception. fix that and update the callers that rely on the old behaviour"}
+{"id": "h2-04", "tier": "tier2-daily", "prompt": "review my changes in the last commit, anything sketchy?"}
+{"id": "h2-05", "tier": "tier2-daily", "prompt": "add a `--dry-run` flag to the sync command and thread it through the uploader and the reporter"}
+{"id": "h2-06", "tier": "tier2-daily", "prompt": "why is `npm run build` failing with 'Module not found: ./utils/format' - it works locally for jo but not in ci"}
+{"id": "h2-07", "tier": "tier2-daily", "prompt": "our UserService has gotten huge, pull the email stuff out into its own class and fix the imports"}
+{"id": "h2-08", "tier": "tier2-daily", "prompt": "flaky: TestReconcile passes alone but fails when run with the whole suite. track it down"}
+{"id": "h2-09", "tier": "tier2-daily", "prompt": "bump us from python 3.9 to 3.12 and fix whatever breaks in the codebase"}
+{"id": "h2-10", "tier": "tier2-daily", "prompt": "the /search endpoint got slow after we added filters, profile it and fix the n+1 in the repository layer"}
+{"id": "h2-11", "tier": "tier2-daily", "prompt": "wire the new FeatureGate component into the settings page and the onboarding flow, update the snapshots"}
+{"id": "h2-12", "tier": "tier2-daily", "prompt": "getting `panic: assignment to entry in nil map` in worker/pool.go line 88 in prod, find out how we get there and patch it"}
+{"id": "h2-13", "tier": "tier2-daily", "prompt": "replace our hand rolled jwt parsing in middleware/ with the library we already vendor and keep the tests green"}
+{"id": "h2-14", "tier": "tier2-daily", "prompt": "the csv import chokes on quoted newlines. fix the parser in importer/ and add a regression test"}
+{"id": "h2-15", "tier": "tier2-daily", "prompt": "clean up the dead code in the notifications module, then make sure lint and the tests still pass"}
+{"id": "h3-01", "tier": "tier3-frontier", "prompt": "we're outgrowing a single redis for sessions. options? need to think about failover and what happens to logged-in users during a partition"}
+{"id": "h3-02", "tier": "tier3-frontier", "prompt": "should we split the monorepo? ~40 engineers, builds take 25 min. lay out the options and what each costs us"}
+{"id": "h3-03", "tier": "tier3-frontier", "prompt": "how would you make our webhook delivery at-least-once without hammering customers who are down - queueing, backoff, dedupe, ordering"}
+{"id": "h3-04", "tier": "tier3-frontier", "prompt": "what's the right way to do multi-tenant row level security in postgres for us vs schema-per-tenant, tradeoffs at 5k tenants"}
+{"id": "h3-05", "tier": "tier3-frontier", "prompt": "two services both write to the orders table and we keep getting lost updates. think through locking vs versioning vs making one the owner"}
+{"id": "h3-06", "tier": "tier3-frontier", "prompt": "we need to rotate signing keys without logging everyone out. come up with an approach and what can go wrong"}
+{"id": "h3-07", "tier": "tier3-frontier", "prompt": "pick: grpc or rest+json between our internal services? latency matters, but so does debuggability and the fact we have 3 languages"}
+{"id": "h3-08", "tier": "tier3-frontier", "prompt": "can a malicious package in our ci steal the deploy token? walk through how and how we'd lock it down"}
+{"id": "h3-09", "tier": "tier3-frontier", "prompt": "our cron-based batch pipeline misses SLAs when a job overruns. what should replace it and how do we migrate without double-processing"}
+{"id": "h3-10", "tier": "tier3-frontier", "prompt": "how do we get to zero-downtime schema changes with a 2 TB mysql table and replicas that lag"}
+{"id": "h3-11", "tier": "tier3-frontier", "prompt": "thinking about moving state from the client to the server for our collaborative whiteboard. consistency model, conflict handling, offline?"}
+{"id": "h3-12", "tier": "tier3-frontier", "prompt": "what breaks first if traffic 10x's next quarter? go through the api, the queue and the db and say where to invest"}
+{"id": "h3-13", "tier": "tier3-frontier", "prompt": "we cache permissions for 10 min and it bit us (revoked user kept access). how should authz caching work so revocation is fast but we don't melt the policy service"}
+{"id": "h3-14", "tier": "tier3-frontier", "prompt": "is it safe to run our migrations from multiple pods at startup? reason about the race conditions and propose something that can't corrupt the schema"}
+{"id": "h3-15", "tier": "tier3-frontier", "prompt": "blue/green vs canary vs feature flags for rolling out the new pricing engine - which combination and why, given we can't easily roll back data changes"}

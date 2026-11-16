@@ -1,0 +1,73 @@
+# ==============================================================================
+# Feature: Base HTTP Security, Method Allow-List, Strict Headers & Safe Errors
+# ==============================================================================
+defaultParameters:
+  - name: CorsAllowedOrigin
+    value: https://console.cloud.google.com
+
+endpoints:
+  - name: default
+    preFlow:
+      request:
+        - name: CORS-Preflight
+        - name: RF-RejectDisallowedMethods
+          condition: request.verb != "POST" and request.verb != "OPTIONS" and not (request.verb = "GET" and (proxy.pathsuffix = "/models" or proxy.pathsuffix = "/v1/models" or proxy.pathsuffix = "/v1beta/models" or proxy.pathsuffix = "/finops" or proxy.pathsuffix = "/v1/finops" or proxy.pathsuffix = "/finops/report" or proxy.pathsuffix = "/v1/finops/report"))
+      response:
+        - name: AM-SetStrictSecurityHeaders
+    faultRules:
+      - name: SafeGenericFaultRule
+        condition: fault.name != "RaiseFault" and (response.status.code = null or response.status.code >= 500)
+        steps:
+          - name: AM-SafeErrorResponse
+          - name: AM-SetStrictSecurityHeaders
+
+steps:
+  - name: CORS-Preflight
+    type: CORS
+    properties:
+      allowOrigins: "{CorsAllowedOrigin}"
+      allowMethods: "GET, POST, OPTIONS"
+      allowHeaders: "Content-Type, Authorization, x-api-key, x-goog-api-key, anthropic-version, anthropic-beta, x-goog-api-client, user-agent, x-routing-mode, x-model-override, x-model-map, x-switchyard-baseline, x-switchyard-ratio, x-switchyard-route-override, x-switchyard-model-map"
+      maxAge: 3600
+      generatePreflightResponse: true
+
+  - name: RF-RejectDisallowedMethods
+    type: RaiseFault
+    properties:
+      statusCode: 405
+      reasonPhrase: Method Not Allowed
+      headers:
+        Allow: "GET, POST, OPTIONS"
+        X-Content-Type-Options: "nosniff"
+        X-Frame-Options: "DENY"
+      payload:
+        contentType: application/json
+        content: |
+          {"error":{"type":"method_not_allowed","message":"Only POST and OPTIONS methods are permitted on this gateway."}}
+
+  - name: AM-SetStrictSecurityHeaders
+    type: AssignMessage
+    properties:
+      set:
+        headers:
+          X-Content-Type-Options: "nosniff"
+          X-Frame-Options: "DENY"
+          Content-Security-Policy: "default-src 'none'; frame-ancestors 'none'"
+          Cache-Control: "no-store, no-cache, must-revalidate"
+          Permissions-Policy: "camera=(), microphone=(), geolocation=()"
+      remove:
+        headers:
+          - X-Powered-By
+          - Server
+
+  - name: AM-SafeErrorResponse
+    type: AssignMessage
+    properties:
+      set:
+        headers:
+          Content-Type: "application/json"
+          Cache-Control: "no-store"
+      payload:
+        contentType: application/json
+        content: |
+          {"error":{"type":"gateway_error","message":"The request could not be completed due to a gateway policy or upstream status check.","request_id":"{messageid}"}}

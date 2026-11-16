@@ -1,0 +1,42 @@
+# Stage 05: Full Production Enterprise AI Gateway with Automatic Vertex Failover
+# Complete governance stack + automatic 429/5xx circuit-breaker fallback to Gemini 3.1 Pro.
+stage: "05-add-vertex-fallback"
+description: "Full production deployment: Dual Auth, <LLMTokenQuota>, Model Armor, Semantic Cache, FinOps DataCapture, and 429/5xx Vertex-to-Vertex Failover."
+proxies:
+  - name: claude-code-gateway
+    template: templates/claude-code-gateway.yaml
+    features:
+      - features/ai-base-security.yaml
+      - features/ai-auth-dual.yaml
+      - features/ai-token-quota.yaml
+      - features/ai-model-preprocess.yaml
+      - features/ai-security-modelarmor.yaml
+      - features/ai-semantic-cache.yaml
+      - features/ai-vertex-fallback.yaml
+      - features/ai-model-postprocess.yaml
+
+  - name: antigravity-gateway
+    template: templates/antigravity-gateway.yaml
+    features:
+      - features/ai-base-security.yaml
+      - features/ai-auth-dual.yaml
+      - features/antigravity-internal.yaml
+      - features/ai-token-quota.yaml
+      - features/ai-model-preprocess.yaml
+      - features/ai-security-modelarmor.yaml
+      - features/ai-semantic-cache.yaml
+      - features/ai-vertex-fallback.yaml
+      - features/ai-model-postprocess.yaml
+
+  - name: codex-gateway
+    template: templates/codex-gateway.yaml
+    features:
+      - features/ai-base-security.yaml
+      - features/ai-auth-dual.yaml
+      - features/antigravity-internal.yaml
+      - features/ai-token-quota.yaml
+      - features/ai-model-preprocess.yaml
+      - features/ai-security-modelarmor.yaml
+      - features/ai-semantic-cache.yaml
+      - features/ai-vertex-fallback.yaml
+      - features/ai-model-postprocess.yaml

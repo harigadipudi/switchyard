@@ -1,0 +1,100 @@
+{"id": "t1-01", "tier": "tier1-fast", "prompt": "What does the -p flag do in mkdir?"}
+{"id": "t1-02", "tier": "tier1-fast", "prompt": "hi, are you there?"}
+{"id": "t1-03", "tier": "tier1-fast", "prompt": "What's the default port for PostgreSQL?"}
+{"id": "t1-04", "tier": "tier1-fast", "prompt": "How do I undo my last git commit but keep the changes?"}
+{"id": "t1-05", "tier": "tier1-fast", "prompt": "What is the difference between let and const in JavaScript?"}
+{"id": "t1-06", "tier": "tier1-fast", "prompt": "List the files in the src directory"}
+{"id": "t1-07", "tier": "tier1-fast", "prompt": "What HTTP status code means Too Many Requests?"}
+{"id": "t1-08", "tier": "tier1-fast", "prompt": "Show me the current git branch"}
+{"id": "t1-09", "tier": "tier1-fast", "prompt": "Convert 255 to hexadecimal"}
+{"id": "t1-10", "tier": "tier1-fast", "prompt": "What does CORS stand for?"}
+{"id": "t1-11", "tier": "tier1-fast", "prompt": "Which Python version introduced f-strings?"}
+{"id": "t1-12", "tier": "tier1-fast", "prompt": "thanks, that worked!"}
+{"id": "t1-13", "tier": "tier1-fast", "prompt": "What's the command to check disk usage on Linux?"}
+{"id": "t1-14", "tier": "tier1-fast", "prompt": "Rename the variable tmp to buffer in this line: tmp = read()"}
+{"id": "t1-15", "tier": "tier1-fast", "prompt": "Is YAML a superset of JSON?"}
+{"id": "t1-16", "tier": "tier1-fast", "prompt": "How do I exit vim?"}
+{"id": "t1-17", "tier": "tier1-fast", "prompt": "What is the file extension for TypeScript declaration files?"}
+{"id": "t1-18", "tier": "tier1-fast", "prompt": "Print the contents of package.json"}
+{"id": "t1-19", "tier": "tier1-fast", "prompt": "What does npm ci do compared to npm install?"}
+{"id": "t1-20", "tier": "tier1-fast", "prompt": "Give me the cron expression for every day at midnight"}
+{"id": "t1-21", "tier": "tier1-fast", "prompt": "What does the acronym ACID mean for databases?"}
+{"id": "t1-22", "tier": "tier1-fast", "prompt": "Search the repo for usages of getUserById"}
+{"id": "t1-23", "tier": "tier1-fast", "prompt": "Which environment variable sets the log level for this service?"}
+{"id": "t1-24", "tier": "tier1-fast", "prompt": "What is the keyboard shortcut to open the terminal in VS Code?"}
+{"id": "t1-25", "tier": "tier1-fast", "prompt": "Does Go have generics?"}
+{"id": "t4-01", "tier": "tier4-open", "prompt": "Write a Python function that checks whether a string is a palindrome, ignoring punctuation and case."}
+{"id": "t4-02", "tier": "tier4-open", "prompt": "Write a Jest test for a function add(a, b) that covers negative numbers and floats."}
+{"id": "t4-03", "tier": "tier4-open", "prompt": "Give me a bash script that deletes all .log files older than 7 days in /var/log/myapp."}
+{"id": "t4-04", "tier": "tier4-open", "prompt": "Write a SQL query that returns the top 5 customers by total order amount in 2024."}
+{"id": "t4-05", "tier": "tier4-open", "prompt": "Create a TypeScript interface and a zod schema for a User with id, email and an optional displayName."}
+{"id": "t4-06", "tier": "tier4-open", "prompt": "Write a Go function that reverses a singly linked list."}
+{"id": "t4-07", "tier": "tier4-open", "prompt": "Generate a Dockerfile for a Node 20 Express app that listens on port 8080."}
+{"id": "t4-08", "tier": "tier4-open", "prompt": "Write a pattern that matches US phone numbers in the form (555) 123-4567 or 555-123-4567."}
+{"id": "t4-09", "tier": "tier4-open", "prompt": "Write a Python script that reads a CSV file and prints the average of the price column."}
+{"id": "t4-10", "tier": "tier4-open", "prompt": "Implement binary search in Rust over a sorted slice of i32."}
+{"id": "t4-11", "tier": "tier4-open", "prompt": "Write a pytest fixture that creates a temporary SQLite database and tears it down after the test."}
+{"id": "t4-12", "tier": "tier4-open", "prompt": "Write a React component that renders a button and counts how many times it was clicked."}
+{"id": "t4-13", "tier": "tier4-open", "prompt": "Write a Java method that removes duplicates from an ArrayList<String> while preserving order."}
+{"id": "t4-14", "tier": "tier4-open", "prompt": "Create a GitHub Actions workflow that runs npm test on every pull request."}
+{"id": "t4-15", "tier": "tier4-open", "prompt": "Write a Python decorator that retries a function up to 3 times with exponential backoff."}
+{"id": "t4-16", "tier": "tier4-open", "prompt": "Write a Kotlin data class for an Address and a function that formats it on one line."}
+{"id": "t4-17", "tier": "tier4-open", "prompt": "Compute the determinant of the 3x3 array [[2,0,1],[1,3,2],[1,1,1]] and show the steps."}
+{"id": "t4-18", "tier": "tier4-open", "prompt": "Write a function in C that counts the number of set bits in a 32-bit unsigned integer."}
+{"id": "t4-19", "tier": "tier4-open", "prompt": "Write a Terraform resource block for a private GCS bucket with versioning enabled."}
+{"id": "t4-20", "tier": "tier4-open", "prompt": "Write a JavaScript debounce function with a configurable delay."}
+{"id": "t4-21", "tier": "tier4-open", "prompt": "Write a Python function to flatten an arbitrarily nested list."}
+{"id": "t4-22", "tier": "tier4-open", "prompt": "Write a Makefile with build, test and clean targets for a Go project."}
+{"id": "t4-23", "tier": "tier4-open", "prompt": "Write a Ruby method that converts snake_case strings to camelCase."}
+{"id": "t4-24", "tier": "tier4-open", "prompt": "Write a shell one-liner that counts the lines of code in all .py files under the current directory."}
+{"id": "t4-25", "tier": "tier4-open", "prompt": "Write a small Express middleware that adds a request ID header to every response."}
+{"id": "t2-01", "tier": "tier2-daily", "prompt": "The checkout page throws 'TypeError: Cannot read properties of undefined (reading map)' after I added the coupon feature. Find the cause in CartSummary.tsx and useCart.ts and fix it."}
+{"id": "t2-02", "tier": "tier2-daily", "prompt": "Migrate our Express routes in src/routes/*.js from callbacks to async/await and update the error-handling middleware accordingly."}
+{"id": "t2-03", "tier": "tier2-daily", "prompt": "Look over this pull request diff for bugs and style problems and suggest concrete changes.\n\n```diff\n- const total = items.reduce((s, i) => s + i.price, 0)\n+ const total = items.map(i => i.price * i.qty).reduce((s, v) => s + v)\n- if (user) applyDiscount(total, user.tier)\n+ applyDiscount(total, user.tier)\n```"}
+{"id": "t2-04", "tier": "tier2-daily", "prompt": "Our integration tests fail intermittently on CI with a timeout in test_payment_flow.py. Look at the test, the fixture and the client wrapper and make the test deterministic."}
+{"id": "t2-05", "tier": "tier2-daily", "prompt": "Add pagination to the /api/orders endpoint: update the controller, the repository query and the OpenAPI spec, and adjust the existing tests."}
+{"id": "t2-06", "tier": "tier2-daily", "prompt": "Rename the UserProfile model to AccountProfile across the Django app, including migrations, serializers, admin and templates."}
+{"id": "t2-07", "tier": "tier2-daily", "prompt": "The memory usage of our worker grows until it is OOM-killed after about six hours. Here is the heap summary; identify the leak in the job scheduler module and patch it.\n\nTop retained: JobContext x 182,304 (1.4 GB), Timer x 182,304, Closure(scheduleRetry) x 182,301"}
+{"id": "t2-08", "tier": "tier2-daily", "prompt": "Extract the duplicated validation logic from OrderForm, InvoiceForm and QuoteForm into a shared hook and update the three components to use it."}
+{"id": "t2-09", "tier": "tier2-daily", "prompt": "Upgrade the project from React Router v5 to v6 and fix every route definition and navigation call that breaks."}
+{"id": "t2-10", "tier": "tier2-daily", "prompt": "Our API returns 500 for requests with emoji in the name field. Trace the request from the controller through the service to the database layer and fix the encoding problem."}
+{"id": "t2-11", "tier": "tier2-daily", "prompt": "Add structured logging with request IDs to every handler in the gateway service and propagate the ID to downstream HTTP calls."}
+{"id": "t2-12", "tier": "tier2-daily", "prompt": "Convert the class components in src/components/dashboard to function components with hooks, keeping behaviour identical."}
+{"id": "t2-13", "tier": "tier2-daily", "prompt": "The nightly export job writes duplicate rows since last week's change to the batching code. Compare the old and new implementation and fix the regression."}
+{"id": "t2-14", "tier": "tier2-daily", "prompt": "Add a feature flag new-billing that switches between the legacy and the new invoice calculator, and cover both paths with tests."}
+{"id": "t2-15", "tier": "tier2-daily", "prompt": "Go through the auth middleware and the session store and tell me why users are logged out after exactly 15 minutes, then fix it."}
+{"id": "t2-16", "tier": "tier2-daily", "prompt": "Replace moment.js with date-fns in the whole frontend package and make sure the date formatting in reports stays the same."}
+{"id": "t2-17", "tier": "tier2-daily", "prompt": "Here is a stack trace from production. Find why discount can be null and add the proper guard plus a regression test.\n\njava.lang.NullPointerException: Cannot invoke \"Discount.getRate()\" because \"discount\" is null\n\tat com.shop.OrderService.applyDiscount(OrderService.java:142)\n\tat com.shop.OrderService.checkout(OrderService.java:88)\n\tat com.shop.api.CheckoutController.post(CheckoutController.java:51)"}
+{"id": "t2-18", "tier": "tier2-daily", "prompt": "Split the 1,200-line utils.py into cohesive modules, update all imports in the package and keep the public API backwards compatible."}
+{"id": "t2-19", "tier": "tier2-daily", "prompt": "Add input validation and proper error responses to the three upload endpoints, and update the client SDK methods that call them."}
+{"id": "t2-20", "tier": "tier2-daily", "prompt": "The Gradle build got twice as slow after the last dependency bump. Inspect the build scan output and the build files and get the build time back down."}
+{"id": "t2-21", "tier": "tier2-daily", "prompt": "Implement soft delete for the Project entity: schema migration, repository filters, service layer and the two affected API endpoints."}
+{"id": "t2-22", "tier": "tier2-daily", "prompt": "Our linter reports 240 violations after enabling strict mode in tsconfig. Fix the type errors in the services directory without using any."}
+{"id": "t2-23", "tier": "tier2-daily", "prompt": "Port the data-access layer from raw SQL strings to the query builder we already use in the reporting module."}
+{"id": "t2-24", "tier": "tier2-daily", "prompt": "The websocket reconnect logic in the mobile client drops messages sent during reconnect. Read ConnectionManager and MessageQueue and make delivery reliable."}
+{"id": "t2-25", "tier": "tier2-daily", "prompt": "Write the missing integration tests for the subscription renewal flow, using the existing test harness and factories."}
+{"id": "t3-01", "tier": "tier3-frontier", "prompt": "Design a multi-region active-active setup for our order service with conflict resolution, and explain the trade-offs between CRDTs and last-writer-wins for our data model."}
+{"id": "t3-02", "tier": "tier3-frontier", "prompt": "We need exactly-once processing for payment events across Kafka, our ledger service and the notification service. Propose a design and walk through every failure mode."}
+{"id": "t3-03", "tier": "tier3-frontier", "prompt": "Propose a sharding strategy for a 4 TB Postgres table with hot tenants, including the migration plan with zero downtime and how to rebalance later."}
+{"id": "t3-04", "tier": "tier3-frontier", "prompt": "Analyse why our optimistic locking scheme can still lose updates when two replicas process the same saga step, and design a fix that survives network partitions."}
+{"id": "t3-05", "tier": "tier3-frontier", "prompt": "Design the tenancy isolation model for a SaaS platform that must support per-tenant encryption keys, data residency and noisy-neighbour protection."}
+{"id": "t3-06", "tier": "tier3-frontier", "prompt": "Compare event sourcing with CQRS against a traditional CRUD model for our inventory domain and recommend one, considering consistency, replay cost and team skills."}
+{"id": "t3-07", "tier": "tier3-frontier", "prompt": "Our p99 latency doubled after moving to a service mesh. Build a hypothesis tree covering connection pooling, mTLS handshakes, retries and head-of-line blocking, and plan the experiments to isolate the cause."}
+{"id": "t3-08", "tier": "tier3-frontier", "prompt": "Design a rate limiter that works across 40 gateway instances with at most 1% over-admission and no single point of failure."}
+{"id": "t3-09", "tier": "tier3-frontier", "prompt": "Threat-model our OAuth device flow for the CLI: enumerate the attack paths, rank them and propose mitigations."}
+{"id": "t3-10", "tier": "tier3-frontier", "prompt": "Design the schema evolution strategy for a protobuf-based event bus with 200 consumers, such that producers can deploy independently."}
+{"id": "t3-11", "tier": "tier3-frontier", "prompt": "Explain how you would make the cache invalidation for our pricing engine correct under concurrent writes from three services, and argue why the invariants hold."}
+{"id": "t3-12", "tier": "tier3-frontier", "prompt": "Plan the migration of a monolith with a shared database to services, deciding the seams, the order of extraction and the data ownership boundaries."}
+{"id": "t3-13", "tier": "tier3-frontier", "prompt": "Design a leader election mechanism for our scheduler that tolerates clock skew and avoids split brain, and justify the choice against using an external coordinator."}
+{"id": "t3-14", "tier": "tier3-frontier", "prompt": "We must cut cloud spend by 30% without hurting availability. Analyse our compute, storage and egress profile and produce a prioritised plan with risks."}
+{"id": "t3-15", "tier": "tier3-frontier", "prompt": "Design a zero-trust network layout for the build farm so that a compromised runner cannot reach signing keys or production."}
+{"id": "t3-16", "tier": "tier3-frontier", "prompt": "Derive the capacity model for the ingestion pipeline: given bursty arrivals and a 5-second SLO, how many partitions and consumers do we need, and what are the backpressure rules?"}
+{"id": "t3-17", "tier": "tier3-frontier", "prompt": "Evaluate whether to adopt a vector database or extend Postgres with pgvector for semantic search over 500 million chunks, including recall, cost and operational risk."}
+{"id": "t3-18", "tier": "tier3-frontier", "prompt": "Design an idempotent retry and compensation scheme for a booking workflow that spans flights, hotels and payments."}
+{"id": "t3-19", "tier": "tier3-frontier", "prompt": "Work out why two-phase commit is unsuitable for our cross-service transfer and design an alternative with clear consistency guarantees."}
+{"id": "t3-20", "tier": "tier3-frontier", "prompt": "Propose an end-to-end observability strategy covering metrics, traces, logs and SLOs for a platform of 150 services, and explain how to keep cardinality and cost under control."}
+{"id": "t3-21", "tier": "tier3-frontier", "prompt": "Design a plugin sandbox for our IDE extension host so third-party code cannot read the user's files or network, and analyse the escape routes."}
+{"id": "t3-22", "tier": "tier3-frontier", "prompt": "Decide between a write-through and a write-behind cache for the profile service given our durability needs, and specify the failure handling."}
+{"id": "t3-23", "tier": "tier3-frontier", "prompt": "Design the consistency model for collaborative editing of infrastructure diagrams with offline support."}
+{"id": "t3-24", "tier": "tier3-frontier", "prompt": "Create a rollout strategy for a breaking database change across 12 teams with canaries, automatic rollback criteria and a communication plan."}
+{"id": "t3-25", "tier": "tier3-frontier", "prompt": "Assess the scalability limits of our current job queue and design its successor for 100x the load, including ordering guarantees and poison-message handling."}

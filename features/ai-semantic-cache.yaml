@@ -1,0 +1,80 @@
+# ==============================================================================
+# Feature: Native Apigee Semantic Caching (<SemanticCacheLookup> & Populate)
+# Uses Vertex AI text-embedding-005 + Vertex AI Vector Search to cache
+# non-streaming coding explanations and documentation lookups.
+#
+# OFF by default (SemanticCacheEnabled = "false"): the two policies stay in the bundle but
+# never execute, because they need infrastructure this repository does not create — a Vector
+# Search index (STREAM_UPDATE, 768 dimensions for text-embedding-005) deployed to an index
+# endpoint. To switch it on for an environment, create those and pass:
+#   SemanticCacheEnabled           "true"
+#   VectorSearchIndexEndpointUrl   https://<publicEndpointDomainName>/v1/projects/<number>/locations/<region>/indexEndpoints/<id>:findNeighbors
+#   VectorSearchUpsertUrl          https://<region>-aiplatform.googleapis.com/v1/projects/<project>/locations/<region>/indexes/<id>:upsertDatapoints
+#   VectorSearchDeployedIndexId    the deployed index ID
+#   SemanticCacheDistanceMeasure   the index's distanceMeasureType (decides how the threshold is compared)
+#
+# Scope: only requests the gateway marks cache-eligible (non-streaming, single turn, no
+# tools, authenticated developer, no X-Bypass-Cache). Apigee does not support these policies
+# on SSE responses handled by an EventFlow, and each eligible request pays for one embedding
+# call and one vector lookup before it reaches the model.
+# ==============================================================================
+defaultParameters:
+  - name: GCPProjectId
+    value: YOUR_GCP_PROJECT_ID
+  - name: SemanticCacheEnabled
+    value: "false"
+  - name: EmbeddingEndpointUrl
+    value: https://us-central1-aiplatform.googleapis.com/v1/projects/{GCPProjectId}/locations/us-central1/publishers/google/models/text-embedding-005:predict
+  - name: VectorSearchIndexEndpointUrl
+    value: https://us-central1-aiplatform.googleapis.com/v1/projects/{GCPProjectId}/locations/us-central1/indexEndpoints/coding-gateway-cache-endpoint:findNeighbors
+  - name: VectorSearchUpsertUrl
+    value: https://us-central1-aiplatform.googleapis.com/v1/projects/{GCPProjectId}/locations/us-central1/indexes/coding-gateway-cache-index:upsertDatapoints
+  - name: VectorSearchDeployedIndexId
+    value: coding_gateway_cache_index
+  - name: SemanticCacheSimilarityThreshold
+    value: "0.98"
+  # Must equal the index's distanceMeasureType. DOT_PRODUCT_DISTANCE treats the threshold as
+  # a minimum similarity; the other measures treat it as a maximum distance.
+  - name: SemanticCacheDistanceMeasure
+    value: DOT_PRODUCT_DISTANCE
+  - name: SemanticCacheTtlSeconds
+    value: "3600"
+
+endpoints:
+  - name: default
+    preFlow:
+      request:
+        - name: AM-SemanticCacheSwitch
+          condition: request.verb != "OPTIONS"
+        - name: SCL-LookupPrompt
+          condition: request.verb != "OPTIONS" and ai.semanticCacheEnabled = "true" and ai.cacheEligible = "true" and ai.semanticCacheKeySource != null
+    postFlow:
+      response:
+        - name: SCP-PopulateResponse
+          condition: request.verb != "OPTIONS" and ai.semanticCacheEnabled = "true" and ai.cacheEligible = "true" and SemanticCacheLookup.SCL-LookupPrompt.cache_hit != true and response.status.code = 200
+
+steps:
+  - name: AM-SemanticCacheSwitch
+    type: AssignMessage
+    properties:
+      assignVariable:
+        - name: ai.semanticCacheEnabled
+          value: "{SemanticCacheEnabled}"
+
+  - name: SCL-LookupPrompt
+    type: SemanticCacheLookup
+    properties:
+      ignoreUnresolvedVariables: true
+      userPromptSource: "{ai.semanticCacheKeySource}"
+      embeddingsCreationEndpoint: "{EmbeddingEndpointUrl}"
+      similaritySearchEndpoint: "{VectorSearchIndexEndpointUrl}"
+      deployedIndexId: "{VectorSearchDeployedIndexId}"
+      similarityThreshold: "{SemanticCacheSimilarityThreshold}"
+      distanceMeasureType: "{SemanticCacheDistanceMeasure}"
+
+  - name: SCP-PopulateResponse
+    type: SemanticCachePopulate
+    properties:
+      ignoreUnresolvedVariables: true
+      ttlInSeconds: "{SemanticCacheTtlSeconds}"
+      upsertEndpoint: "{VectorSearchUpsertUrl}"

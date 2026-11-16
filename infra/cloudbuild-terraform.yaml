@@ -1,0 +1,60 @@
+# ==============================================================================
+# infra/cloudbuild-terraform.yaml
+# Compiles the Apigee X XML proxy bundles and provisions the entire Switchyard
+# Coding Agent Model Router gateway and control plane via Terraform inside GCP
+# Cloud Build (no local Terraform binary required).
+#
+# Usage:
+#   gcloud builds submit --project="${GCP_PROJECT_ID}" \
+#     --config=infra/cloudbuild-terraform.yaml .
+# ==============================================================================
+steps:
+  - id: compile-apigee-bundles
+    name: python:3.12-slim
+    entrypoint: bash
+    env:
+      - GCP_PROJECT_ID=${PROJECT_ID}
+      - MODEL_ARMOR_REGION=${_REGION}
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        apt-get update -qq && apt-get install -y -qq zip >/dev/null
+        chmod +x deploy.sh
+        ./deploy.sh --stage "${_APIGEE_STAGE}" --build-only
+        ls -lh "build/${_APIGEE_STAGE}/"
+
+  - id: terraform-init-plan-apply
+    name: hashicorp/terraform:1.9
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        set -eu
+        terraform -chdir=infra init -reconfigure \
+          -backend-config="bucket=${PROJECT_ID}-terraform-state" \
+          -backend-config="prefix=${_TF_STATE_PREFIX}"
+        terraform -chdir=infra validate
+        terraform -chdir=infra plan \
+          -var="project_id=${PROJECT_ID}" \
+          -var="region=${_REGION}" \
+          -var="apigee_env=${_APIGEE_ENV}" \
+          -var="apigee_envgroup=${_APIGEE_ENVGROUP}" \
+          -var="apigee_stage=${_APIGEE_STAGE}" \
+          -var="custom_domain=${_CUSTOM_DOMAIN}" \
+          -var="use_existing_apigee_org=true" \
+          -out=tfplan
+        terraform -chdir=infra apply -auto-approve tfplan
+        terraform -chdir=infra output
+
+substitutions:
+  _REGION: us-central1
+  _APIGEE_ENV: ai-gateway-prod-comprehensive
+  _APIGEE_ENVGROUP: ai-gateway-envgroup
+  _APIGEE_STAGE: 07-mvp-pilot
+  _CUSTOM_DOMAIN: 35.208.252.45.nip.io
+  _TF_STATE_PREFIX: switchyard/state
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 1800s

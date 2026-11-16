@@ -1,0 +1,91 @@
+# ==============================================================================
+# Feature: Rule-first Smart Router with a pluggable classifier
+#
+# Adds two steps around the LLM judge that features/ai-model-preprocess.yaml owns:
+#
+#   JS-PrepareSmartJudge  runs the deterministic keyword rules first and decides whether a
+#                         classifier call is needed at all. When a rule already decides, no
+#                         callout is made (the judge used to be called on every auto request).
+#   SC-CustomClassifier   optional. POSTs the developer's latest prompt to an HTTP classifier
+#                         you run yourself and reads back a tier. Used only when JudgeBackend
+#                         is "custom"; the default classifier is the LLM judge.
+#
+# Selection order for `model: auto` stays: deterministic rule > classifier > prompt length.
+#
+# Bring your own classifier: set JudgeBackend to "custom" and point CustomClassifierUrl at
+# any service that accepts
+#   {"prompt": "...", "harness": "...", "protocol": "..."}
+# and answers with a JSON object carrying either
+#   "tier":  tier1-fast | tier4-open | tier2-daily | tier3-frontier      or
+#   "label": SIMPLE | MEDIUM | COMPLEX | REASONING
+# plus optional "confidence" (0-1), "classifier" (name shown in X-Router-Classifier-Model)
+# and "abstain": true (fall through to the next step). Anything else is ignored, so a faulty
+# classifier can never select a tier the gateway does not know, and RBAC tier caps still
+# apply afterwards. The call is authenticated with a Google-signed ID token for
+# CustomClassifierAudience (Cloud Run: the service URL), minted for the proxy's service
+# account, which needs roles/run.invoker on that service.
+# ==============================================================================
+defaultParameters:
+  # gemini    = LLM judge (SC-ModelJudge), the default
+  # custom    = SC-CustomClassifier (your own classifier endpoint)
+  # heuristic = rules + prompt-length fallback only, never a network call
+  - name: JudgeBackend
+    value: gemini
+  # "true" lets the X-Router-Classifier request header pick the backend per request.
+  # For benchmarking environments; leave "false" in production.
+  - name: AllowClassifierOverride
+    value: "false"
+  # Placeholders: only read when JudgeBackend (or the per-request override) is "custom".
+  - name: CustomClassifierUrl
+    value: https://classifier.invalid/v1/classify
+  - name: CustomClassifierAudience
+    value: https://classifier.invalid
+  # Upper bound on what the classifier may add to a request. On timeout or any error the
+  # callout is skipped (continueOnError) and selection falls back to prompt length.
+  - name: CustomClassifierTimeoutMs
+    value: 1500
+
+endpoints:
+  - name: default
+    preFlow:
+      request:
+        - name: JS-PrepareSmartJudge
+          after: RF-ModelForbidden
+          condition: request.verb != "OPTIONS" and ai.useSmartJudge = "true"
+        - name: SC-CustomClassifier
+          after: SC-ModelJudge
+          condition: request.verb != "OPTIONS" and ai.useSmartJudge = "true" and ai.judgeBackend = "custom"
+
+steps:
+  - name: JS-PrepareSmartJudge
+    type: JavaScript
+    properties:
+      resourceURL: jsc://applySmartJudgeSelection.js
+      timeLimit: 200
+      properties:
+        phase: prepare
+        judgeBackend: "{JudgeBackend}"
+        allowClassifierOverride: "{AllowClassifierOverride}"
+
+  - name: SC-CustomClassifier
+    type: ServiceCallout
+    properties:
+      timeout: "{CustomClassifierTimeoutMs}"
+      request:
+        variable: customClassifierRequest
+        set:
+          verb: POST
+          payload:
+            contentType: application/json
+            content: |
+              {
+                "prompt": "{ai.escapedPrompt}",
+                "harness": "{coding_harness}",
+                "protocol": "{client_protocol}"
+              }
+      response: customClassifierResponse
+      httpTargetConnection:
+        url: "{CustomClassifierUrl}"
+        authentication:
+          googleIdToken:
+            audience: "{CustomClassifierAudience}"

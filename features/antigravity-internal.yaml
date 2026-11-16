@@ -1,0 +1,43 @@
+# ==============================================================================
+# Feature: Google Antigravity Enterprise Gateway Contract
+# Implements the mandatory rules from the Antigravity Enterprise Gateway Guide:
+# 1. Intercept POST /v1beta:* (e.g. /v1beta:recordClientEvent) and /v1internal:*
+#    telemetry calls and return instant HTTP 200 OK with {}.
+# 2. Forward inbound User-Agent (Antigravity/...) and X-Goog-Api-Client / custom
+#    X-* headers unchanged without fabricating attribution headers when missing.
+# 3. Route /v1beta/models/{model}:streamGenerateContent without buffering.
+# ==============================================================================
+endpoints:
+  - name: default
+    preFlow:
+      request:
+        - name: JS-SanitizeAntigravityTelemetry
+          condition: request.verb != "OPTIONS"
+    flows:
+      - name: AntigravityInternalTelemetryFlow
+        condition: ai.isAntigravityTelemetry = "true" or proxy.pathsuffix MatchesPath "/v1beta:*" or request.uri MatchesPath "/v1beta:*" or proxy.pathsuffix MatchesPath "/v1internal*" or request.uri MatchesPath "/v1internal*"
+        request: []
+        response:
+          - name: AM-AckAntigravityInternal
+
+steps:
+  - name: JS-SanitizeAntigravityTelemetry
+    type: JavaScript
+    properties:
+      resourceURL: jsc://sanitizeAntigravityTelemetry.js
+      timeLimit: 200
+
+  - name: AM-AckAntigravityInternal
+    type: AssignMessage
+    properties:
+      set:
+        statusCode: 200
+        reasonPhrase: OK
+        headers:
+          Content-Type: "application/json"
+          X-Antigravity-Gateway: "apigee-enterprise-v1"
+          X-Antigravity-Telemetry-Handled: "true"
+          X-Content-Type-Options: "nosniff"
+      payload:
+        contentType: application/json
+        content: "{}"

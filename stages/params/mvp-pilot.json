@@ -1,0 +1,5 @@
+{
+  "JudgeBackend": "gemini",
+  "AllowClassifierOverride": "false",
+  "SemanticCacheEnabled": "false"
+}

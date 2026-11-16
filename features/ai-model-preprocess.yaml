@@ -1,0 +1,138 @@
+# ==============================================================================
+# Feature: Multi-Model Preprocessing, RBAC Check & LLM-Judge Smart Routing
+# Supports switching between Gemini, Claude, Qwen, GLM, and DeepSeek on
+# Vertex AI Model Garden from any coding harness (Claude Code, Antigravity, Codex).
+# ==============================================================================
+defaultParameters:
+  - name: GCPProjectId
+    value: YOUR_PROJECT_ID
+  - name: VertexRegion
+    value: global
+  - name: VertexAnthropicRegion
+    value: us-east5
+  # LLM judge used by `model: auto` when no deterministic rule decides. Must be a model the
+  # project can call at the global endpoint; a 404 here is swallowed (continueOnError) and
+  # every auto request silently drops to the prompt-length fallback.
+  - name: JudgeModel
+    value: gemini-3.5-flash-lite
+  # Instruction placed in front of the developer request. Keep it free of double quotes and
+  # curly braces: it is embedded in a JSON string inside an Apigee message template.
+  - name: JudgeInstruction
+    value: "Classify the complexity of this software engineering request into exactly one token: SIMPLE, MEDIUM, COMPLEX, or REASONING."
+  - name: JudgeTimeoutMs
+    value: 3000
+  - name: SimpleRouteModel
+    value: google/gemini-3.5-flash-lite
+  - name: MediumRouteModel
+    value: qwen/qwen3-coder
+  - name: ComplexRouteModel
+    value: anthropic/claude-sonnet-4-6
+  - name: ReasoningRouteModel
+    value: google/gemini-3.1-pro-preview
+  - name: FinopsIngestionMode
+    value: USAGE
+
+endpoints:
+  - name: default
+    preFlow:
+      request:
+        - name: JS-ParseAndValidateModelRequest
+          condition: request.verb != "OPTIONS" and ai.isAntigravityTelemetry != "true"
+        - name: RF-BudgetExceeded
+          condition: request.verb != "OPTIONS" and ai.budgetHardBlocked = "true"
+        - name: RF-ModelNotFound
+          condition: request.verb != "OPTIONS" and ai.modelNotFound = "true"
+        - name: RF-ModelForbidden
+          condition: request.verb != "OPTIONS" and ai.modelNotFound != "true" and ai.modelAllowed = "false"
+        # ai.judgeBackend is only set when features/ai-pluggable-classifier.yaml installs
+        # JS-PrepareSmartJudge; without it the variable is null and the judge always runs.
+        - name: SC-ModelJudge
+          condition: request.verb != "OPTIONS" and ai.useSmartJudge = "true" and ai.judgeBackend != "none" and ai.judgeBackend != "custom"
+        - name: JS-ApplySmartJudgeSelection
+          condition: request.verb != "OPTIONS" and ai.useSmartJudge = "true"
+        - name: JS-TransformPayload
+          condition: request.verb != "OPTIONS" and ai.isAntigravityTelemetry != "true" and ai.isCatalogOrFinopsRequest != "true"
+
+steps:
+  - name: JS-ParseAndValidateModelRequest
+    type: JavaScript
+    properties:
+      resourceURL: jsc://parseAndValidateModelRequest.js
+      timeLimit: 2000
+      properties:
+        gcpProjectId: "{GCPProjectId}"
+        finopsIngestionMode: "{FinopsIngestionMode}"
+
+  - name: RF-BudgetExceeded
+    type: RaiseFault
+    properties:
+      statusCode: 402
+      reasonPhrase: Payment Required
+      headers:
+        X-Content-Type-Options: "nosniff"
+        X-Switchyard-Budget-Exceeded-Until: "{ai.budgetExceededUntil}"
+      payload:
+        contentType: application/json
+        content: |
+          {"error":{"type":"budget_exceeded_error","message":"Daily USD spend limit (${ai.budgetLimitUsd}) exceeded (${ai.budgetSpendUsd} used). Switch to 'auto' / Gemini Credit Pool or wait until reset.","scope":"{ai.budgetScope}","exceeded_until":"{ai.budgetExceededUntil}"}}
+
+  - name: RF-ModelNotFound
+    type: RaiseFault
+    properties:
+      statusCode: 404
+      reasonPhrase: Not Found
+      headers:
+        X-Content-Type-Options: "nosniff"
+      payload:
+        contentType: application/json
+        content: |
+          {"error":{"type":"not_found_error","message":"Requested model '{ai.requestedModel}' is not registered in the gateway catalog."}}
+
+  - name: RF-ModelForbidden
+    type: RaiseFault
+    properties:
+      statusCode: 403
+      reasonPhrase: Forbidden
+      headers:
+        X-Content-Type-Options: "nosniff"
+      payload:
+        contentType: application/json
+        content: |
+          {"error":{"type":"permission_error","message":"Requested model '{ai.requestedModel}' is not permitted under your API Product tier ('{auth.tier}')."}}
+
+  - name: SC-ModelJudge
+    type: ServiceCallout
+    properties:
+      timeout: "{JudgeTimeoutMs}"
+      request:
+        variable: smartJudgeRequest
+        set:
+          verb: POST
+          headers:
+            Content-Type: application/json
+          payload:
+            contentType: application/json
+            content: |
+              {
+                "contents": [{"role": "user", "parts": [{"text": "{JudgeInstruction}\nRequest: {ai.escapedPrompt}"}]}],
+                "generationConfig": {"temperature": 0.0, "maxOutputTokens": 64, "thinkingConfig": {"thinkingLevel": "MINIMAL"}}
+              }
+      response: smartJudgeResponse
+      httpTargetConnection:
+        url: "https://aiplatform.googleapis.com/v1/projects/{GCPProjectId}/locations/global/publishers/google/models/{JudgeModel}:generateContent"
+        authentication:
+          googleAccessToken:
+            scopes:
+              scope: https://www.googleapis.com/auth/cloud-platform
+
+  - name: JS-ApplySmartJudgeSelection
+    type: JavaScript
+    properties:
+      resourceURL: jsc://applySmartJudgeSelection.js
+      timeLimit: 500
+
+  - name: JS-TransformPayload
+    type: JavaScript
+    properties:
+      resourceURL: jsc://transformPayload.js
+      timeLimit: 2000

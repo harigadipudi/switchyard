@@ -1,0 +1,714 @@
+{
+  "displayName": "Coding Agent Enterprise FinOps & Multi-Harness Governance",
+  "dashboardFilters": [
+    {
+      "labelKey": "developer_email",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "gateway_key_name",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "credential_type",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "team_name",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "coding_harness",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "routed_model",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "routing_mode",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "project_name",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "environment",
+      "filterType": "METRIC_LABEL"
+    },
+    {
+      "labelKey": "ingestion_mode",
+      "filterType": "METRIC_LABEL"
+    }
+  ],
+  "mosaicLayout": {
+    "columns": 12,
+    "tiles": [
+      {
+        "xPos": 0,
+        "yPos": 0,
+        "width": 12,
+        "height": 3,
+        "widget": {
+          "title": "100% Native GCP AI Gateway FinOps, Team Chargeback & Multi-Harness Governance Console",
+          "text": {
+            "format": "MARKDOWN",
+            "content": "### Apigee X + Vertex AI Model Garden Unified FinOps (`@GCP_PROJECT_ID@` — Zero Self-Hosted Databases)\n- **Org-Wide Totals by Default (Filterable)**: Scorecards show totals **across all developers & teams** when top filters are `*`, or scope down dynamically when you pick a `team_name`, `developer_email`, or `coding_harness`.\n- **Spend vs. Savings Explained Plainly**: **Vertex AI List Spend (`$`)** = public rate-card cost of routed calls · **Actual Billed Spend (`$ After Credits`)** = actual GCP invoice charge after **@GEMINI_POOL_SUMMARY@** (`$0` on Gemini) + **@GCP_FSP_DISCOUNT_PCT@% GCP FSP commit discount** · **Total Saved vs Unrouted Opus (`$`)** = money saved vs. sending every call to Claude Opus (`$15/$75`).\n- **Tip**: Keep **`Group by`** set to `None` in the top-left bar so per-Team, per-Developer, and per-Model tables display their own breakdown columns."
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 3,
+        "width": 2,
+        "height": 3,
+        "widget": {
+          "title": "Vertex AI List Spend ($)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(sum_over_time(logging_googleapis_com:user_ai_router_actual_cost_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+              "unitOverride": "USD",
+              "outputFullDuration": true
+            },
+            "blankView": {}
+          }
+        }
+      },
+      {
+        "xPos": 2,
+        "yPos": 3,
+        "width": 2,
+        "height": 3,
+        "widget": {
+          "title": "Actual Billed Spend ($ After Credits)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(sum_over_time(logging_googleapis_com:user_ai_router_net_cash_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+              "unitOverride": "USD",
+              "outputFullDuration": true
+            },
+            "blankView": {}
+          }
+        }
+      },
+      {
+        "xPos": 4,
+        "yPos": 3,
+        "width": 2,
+        "height": 3,
+        "widget": {
+          "title": "Total Saved vs Unrouted Opus ($)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(sum_over_time(logging_googleapis_com:user_ai_router_savings_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+              "unitOverride": "USD",
+              "outputFullDuration": true
+            },
+            "blankView": {}
+          }
+        }
+      },
+      {
+        "xPos": 6,
+        "yPos": 3,
+        "width": 2,
+        "height": 3,
+        "widget": {
+          "title": "Avoidable Overkill (\"Left-on-the-Table $\")",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "sum(sum_over_time(logging_googleapis_com:user_ai_router_avoidable_frontier_spend_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+              "unitOverride": "USD",
+              "outputFullDuration": true
+            },
+            "blankView": {}
+          }
+        }
+      },
+      {
+        "xPos": 8,
+        "yPos": 3,
+        "width": 2,
+        "height": 3,
+        "widget": {
+          "title": "Total Requests (API Calls)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "round(sum(sum_over_time(logging_googleapis_com:user_ai_router_turn_count{monitored_resource=\"global\"}[${__interval}])))",
+              "outputFullDuration": true
+            },
+            "blankView": {}
+          }
+        }
+      },
+      {
+        "xPos": 10,
+        "yPos": 3,
+        "width": 2,
+        "height": 3,
+        "widget": {
+          "title": "Total Tokens (In + Cached + Out)",
+          "scorecard": {
+            "timeSeriesQuery": {
+              "prometheusQuery": "round(sum(sum_over_time(logging_googleapis_com:user_ai_router_total_tokens_sum{monitored_resource=\"global\"}[${__interval}])))",
+              "outputFullDuration": true
+            },
+            "blankView": {}
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 6,
+        "width": 7,
+        "height": 4,
+        "widget": {
+          "title": "Cost Over Time by Model ($ USD)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum by (routed_model) (sum_over_time(logging_googleapis_com:user_ai_router_actual_cost_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+                  "unitOverride": "USD"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Cost ($ USD)",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 7,
+        "yPos": 6,
+        "width": 5,
+        "height": 4,
+        "widget": {
+          "title": "Spend Comparison: Unrouted Opus vs. Vertex List vs. Actual Billed ($)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "1. Unrouted Opus Cost ($)",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum(sum_over_time(logging_googleapis_com:user_ai_router_actual_cost_usd_sum{monitored_resource=\"global\"}[${__interval}])) + sum(sum_over_time(logging_googleapis_com:user_ai_router_savings_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+                  "unitOverride": "USD"
+                }
+              },
+              {
+                "plotType": "STACKED_AREA",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "2. Vertex AI List Spend ($)",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum(sum_over_time(logging_googleapis_com:user_ai_router_actual_cost_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+                  "unitOverride": "USD"
+                }
+              },
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "3. Actual Billed Spend ($ After Credits)",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum(sum_over_time(logging_googleapis_com:user_ai_router_net_cash_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+                  "unitOverride": "USD"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Spend ($ USD)",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 10,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Cost by Engineering Team — Chargeback ($ USD)",
+          "timeSeriesTable": {
+            "metricVisualization": "BAR",
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "topk(20, sum by (team_name) (sum_over_time(logging_googleapis_com:user_ai_router_actual_cost_usd_sum{monitored_resource=\"global\"}[${__interval}])))",
+                  "unitOverride": "USD",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 4,
+        "yPos": 10,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Tokens by Engineering Team — Usage Rollup (Tokens)",
+          "timeSeriesTable": {
+            "metricVisualization": "BAR",
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "topk(20, round(sum by (team_name) (sum_over_time(logging_googleapis_com:user_ai_router_total_tokens_sum{monitored_resource=\"global\"}[${__interval}]))))",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 8,
+        "yPos": 10,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Avoidable Overkill by Team & Developer (\"Left-on-the-Table $\")",
+          "timeSeriesTable": {
+            "metricVisualization": "BAR",
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "topk(20, sum by (team_name, developer_email) (sum_over_time(logging_googleapis_com:user_ai_router_avoidable_frontier_spend_usd_sum{monitored_resource=\"global\"}[${__interval}])))",
+                  "unitOverride": "USD",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 14,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Cost by Developer — Top 20 ($ USD, Service Keys Excluded)",
+          "timeSeriesTable": {
+            "metricVisualization": "BAR",
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "topk(20, sum by (developer_email, team_name) (sum_over_time(logging_googleapis_com:user_ai_router_key_cost_usd_sum{monitored_resource=\"global\",credential_type!=\"service_key\"}[${__interval}])))",
+                  "unitOverride": "USD",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 4,
+        "yPos": 14,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Tokens by Developer — Top 20 (Tokens, Service Keys Excluded)",
+          "timeSeriesTable": {
+            "metricVisualization": "BAR",
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "topk(20, round(sum by (developer_email, team_name) (sum_over_time(logging_googleapis_com:user_ai_router_total_tokens_sum{monitored_resource=\"global\",developer_email!~\"^(ci-|bot-|svc-|lab-ci-svc).*\"}[${__interval}]))))",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 8,
+        "yPos": 14,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Requests by Developer — Top 20 (Turns, Service Keys Excluded)",
+          "timeSeriesTable": {
+            "metricVisualization": "BAR",
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "topk(20, round(sum by (developer_email, team_name) (sum_over_time(logging_googleapis_com:user_ai_router_attribution_turns{monitored_resource=\"global\",credential_type!=\"service_key\"}[${__interval}]))))",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 18,
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Cost by Gateway Key — Top 20 ($ USD, User + CI Service Keys)",
+          "timeSeriesTable": {
+            "metricVisualization": "BAR",
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "topk(20, sum by (gateway_key_name, credential_type) (sum_over_time(logging_googleapis_com:user_ai_router_key_cost_usd_sum{monitored_resource=\"global\"}[${__interval}])))",
+                  "unitOverride": "USD",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 6,
+        "yPos": 18,
+        "width": 6,
+        "height": 4,
+        "widget": {
+          "title": "Cost by Model — Top 20 Vertex AI Model Garden Models ($ USD)",
+          "timeSeriesTable": {
+            "metricVisualization": "BAR",
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "topk(20, sum by (routed_model) (sum_over_time(logging_googleapis_com:user_ai_router_actual_cost_usd_sum{monitored_resource=\"global\"}[${__interval}])))",
+                  "unitOverride": "USD",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 22,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Routing Mode Breakdown (smart_auto vs daily_direct vs manual_frontier_pin)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "round(sum by (routing_mode) (sum_over_time(logging_googleapis_com:user_ai_router_turn_count{monitored_resource=\"global\"}[${__interval}])))"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Turns",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 4,
+        "yPos": 22,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Recommended Tier vs Actual Executed Tier (Over-Provisioning Detector)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "round(sum by (recommended_tier, actual_tier) (sum_over_time(logging_googleapis_com:user_ai_router_turn_count{monitored_resource=\"global\"}[${__interval}])))"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Turns",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 8,
+        "yPos": 22,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Router Judge Auditability & Model Distribution (Zero Self-Preference Check)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "round(sum by (smart_router_decision, routed_model) (sum_over_time(logging_googleapis_com:user_ai_router_governance_turns{monitored_resource=\"global\"}[${__interval}])))"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Turns",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 26,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Model Spend Share (Donut)",
+          "pieChart": {
+            "chartType": "DONUT",
+            "showLabels": true,
+            "dataSets": [
+              {
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum by (routed_model) (sum_over_time(logging_googleapis_com:user_ai_router_actual_cost_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+                  "unitOverride": "USD",
+                  "outputFullDuration": true
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 4,
+        "yPos": 26,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Spend by Coding Harness & Funding Pool (Gemini Credits vs GCP FSP)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum by (coding_harness, funding_pool) (sum_over_time(logging_googleapis_com:user_ai_router_actual_cost_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+                  "unitOverride": "USD"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Spend ($ USD)",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 8,
+        "yPos": 26,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Streaming TTFT & Turn Latency by Model (p95 ms)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "histogram_quantile(0.95, sum by (le, routed_model) (rate(logging_googleapis_com:user_ai_router_ttft_ms_bucket{monitored_resource=\"global\"}[${__interval}])))",
+                  "unitOverride": "ms"
+                }
+              },
+              {
+                "plotType": "LINE",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "histogram_quantile(0.95, sum by (le, routed_model) (rate(logging_googleapis_com:user_ai_router_latency_ms_bucket{monitored_resource=\"global\"}[${__interval}])))",
+                  "unitOverride": "ms"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Latency (ms)",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 30,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Turns by Engineering Workload & Subagent Isolation",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "round(sum by (workload_category, is_subagent) (sum_over_time(logging_googleapis_com:user_ai_router_governance_turns{monitored_resource=\"global\"}[${__interval}])))"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Turns",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 4,
+        "yPos": 30,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "New vs Prompt-Cached Tokens by Repo (Why Context Is 70%+ Cached)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "Cached Context Reads (0.1x) — ${metric.project_name}",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "round(sum by (project_name) (sum_over_time(logging_googleapis_com:user_ai_router_cached_tokens_sum{monitored_resource=\"global\"}[${__interval}])))"
+                }
+              },
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "legendTemplate": "Uncached In + Out Tokens — ${metric.project_name}",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "clamp_min(round(sum by (project_name) (sum_over_time(logging_googleapis_com:user_ai_router_total_tokens_sum{monitored_resource=\"global\"}[${__interval}]))) - round(sum by (project_name) (sum_over_time(logging_googleapis_com:user_ai_router_cached_tokens_sum{monitored_resource=\"global\"}[${__interval}]))), 0)"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Tokens",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 8,
+        "yPos": 30,
+        "width": 4,
+        "height": 4,
+        "widget": {
+          "title": "Main Agent vs Background Subagent Spend by Team ($ USD)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "minAlignmentPeriod": "60s",
+                "timeSeriesQuery": {
+                  "prometheusQuery": "sum by (is_subagent, team_name) (sum_over_time(logging_googleapis_com:user_ai_router_governance_cost_usd_sum{monitored_resource=\"global\"}[${__interval}]))",
+                  "unitOverride": "USD"
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Spend ($ USD)",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 0,
+        "yPos": 34,
+        "width": 6,
+        "height": 5,
+        "widget": {
+          "title": "W3C-Correlated Turn, Subagent & Cloud Trace Audit Explorer (apigee-ai-finops)",
+          "logsPanel": {
+            "filter": "logName=\"projects/@GCP_PROJECT_ID@/logs/apigee-ai-finops\" AND jsonPayload.event_type=\"ai_router_finops_turn\"",
+            "resourceNames": [
+              "projects/@GCP_PROJECT_ID@"
+            ]
+          }
+        }
+      },
+      {
+        "xPos": 6,
+        "yPos": 34,
+        "width": 3,
+        "height": 5,
+        "widget": {
+          "title": "Apigee X Gateway Volume & Quota/Safety Status (200 vs 429 vs 403)",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "STACKED_BAR",
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"apigee.googleapis.com/proxyv2/response_count\" resource.type=\"apigee.googleapis.com/ProxyV2\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_DELTA",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"proxy_name\"",
+                        "metric.label.\"response_code\""
+                      ]
+                    }
+                  }
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Requests / min",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      },
+      {
+        "xPos": 9,
+        "yPos": 34,
+        "width": 3,
+        "height": 5,
+        "widget": {
+          "title": "Vertex AI Backend Invocations & 429 Failover Status",
+          "xyChart": {
+            "dataSets": [
+              {
+                "plotType": "LINE",
+                "timeSeriesQuery": {
+                  "timeSeriesFilter": {
+                    "filter": "metric.type=\"aiplatform.googleapis.com/publisher/online_serving/model_invocation_count\" resource.type=\"aiplatform.googleapis.com/PublisherModel\"",
+                    "aggregation": {
+                      "alignmentPeriod": "60s",
+                      "perSeriesAligner": "ALIGN_SUM",
+                      "crossSeriesReducer": "REDUCE_SUM",
+                      "groupByFields": [
+                        "resource.label.\"model_user_id\"",
+                        "metric.label.\"response_code\""
+                      ]
+                    }
+                  }
+                }
+              }
+            ],
+            "yAxis": {
+              "label": "Invocations / min",
+              "scale": "LINEAR"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+# Stage 06: Stage 05 + rule-first Smart Router with a pluggable classifier
+# Everything in stage 05, plus features/ai-pluggable-classifier.yaml: deterministic rules are
+# evaluated before any classifier call, and the remaining `model: auto` requests are classified
+# by the LLM judge (gemini-3.5-flash-lite, the default) or by a classifier service you supply.
+#
+# Environment-specific values are not set here. Pass them at build/deploy time, for example to
+# use your own classifier instead of the judge:
+#   STAGE_PARAMS='{"JudgeBackend":"custom","CustomClassifierUrl":"https://.../v1/classify","CustomClassifierAudience":"https://..."}' \
+#     ./deploy.sh --stage 06-add-pluggable-classifier --build-only
+stage: "06-add-pluggable-classifier"
+description: "Stage 05 plus rule-first Smart Router with a pluggable classifier backend (LLM judge by default, or bring-your-own)."
+parameters:
+  # The four labels with the definitions the gateway's own rules and tier names already use.
+  # Without definitions the judge rates most requests one level lower than those rules do
+  # (measured on tests/data/routing_eval.jsonl; see docs/smart-router-classification.md).
+  # Delete this entry to keep the stage 05 instruction.
+  - name: JudgeInstruction
+    value: "Classify this developer request for model routing. Answer with exactly one token: SIMPLE, MEDIUM, COMPLEX, or REASONING.\nSIMPLE = a quick factual answer, definition, short explanation, greeting, status check or one-line command.\nMEDIUM = write one small self-contained piece of code such as a function, test, script, query or config file, or work a math exercise.\nCOMPLEX = change, fix, review or extend existing code across files, or find the cause of a failure in an existing codebase.\nREASONING = design a system, compare design options and trade-offs, or reason about concurrency, scale, security or failure modes."
+proxies:
+  - name: claude-code-gateway
+    template: templates/claude-code-gateway.yaml
+    features:
+      - features/ai-base-security.yaml
+      - features/ai-auth-dual.yaml
+      - features/ai-token-quota.yaml
+      - features/ai-model-preprocess.yaml
+      - features/ai-pluggable-classifier.yaml
+      - features/ai-security-modelarmor.yaml
+      - features/ai-semantic-cache.yaml
+      - features/ai-vertex-fallback.yaml
+      - features/ai-model-postprocess.yaml
+
+  - name: antigravity-gateway
+    template: templates/antigravity-gateway.yaml
+    features:
+      - features/ai-base-security.yaml
+      - features/ai-auth-dual.yaml
+      - features/antigravity-internal.yaml
+      - features/ai-token-quota.yaml
+      - features/ai-model-preprocess.yaml
+      - features/ai-pluggable-classifier.yaml
+      - features/ai-security-modelarmor.yaml
+      - features/ai-semantic-cache.yaml
+      - features/ai-vertex-fallback.yaml
+      - features/ai-model-postprocess.yaml
+
+  - name: codex-gateway
+    template: templates/codex-gateway.yaml
+    features:
+      - features/ai-base-security.yaml
+      - features/ai-auth-dual.yaml
+      - features/antigravity-internal.yaml
+      - features/ai-token-quota.yaml
+      - features/ai-model-preprocess.yaml
+      - features/ai-pluggable-classifier.yaml
+      - features/ai-security-modelarmor.yaml
+      - features/ai-semantic-cache.yaml
+      - features/ai-vertex-fallback.yaml
+      - features/ai-model-postprocess.yaml

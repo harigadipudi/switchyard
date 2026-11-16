@@ -1,0 +1,112 @@
+apiVersion: apigee.googleapis.com/v1
+kind: ApiProxy
+metadata:
+  name: antigravity-gateway
+  description: >-
+    Enterprise AI Gateway Proxy for Google Antigravity IDE (/v1beta/models/*, /v1beta1/*, /v1/chat/completions, /v1beta:*, and /v1internal:*).
+    Implements Antigravity Enterprise Gateway telemetry sanitization, POST /v1beta:* & /v1internal:* 200 OK
+    handling, User-Agent & X-Goog-Api-Client header preservation, and multi-model routing to Vertex AI Model Garden.
+spec:
+  proxyEndpoints:
+    - name: default
+      basePath: /
+      flows: []
+      routeRules:
+        - name: antigravity-internal-noop
+          condition: ai.isAntigravityTelemetry = "true" or ai.isCatalogOrFinopsRequest = "true" or proxy.pathsuffix MatchesPath "/v1beta:*" or proxy.pathsuffix MatchesPath "/v1internal*"
+        - name: route-to-vertex-anthropic-stream
+          condition: target_model_family = "anthropic" and is_streaming = "true"
+          targetEndpoint: vertex-anthropic-stream-target
+        - name: route-to-vertex-openapi-maas-stream
+          condition: target_model_family = "openapi_maas" and is_streaming = "true"
+          targetEndpoint: vertex-openapi-maas-stream-target
+        - name: route-to-vertex-gemini-stream
+          condition: is_streaming = "true"
+          targetEndpoint: vertex-gemini-stream-target
+        - name: route-to-vertex-anthropic
+          condition: target_model_family = "anthropic"
+          targetEndpoint: vertex-anthropic-target
+        - name: route-to-vertex-openapi-maas
+          condition: target_model_family = "openapi_maas"
+          targetEndpoint: vertex-openapi-maas-target
+        - name: route-to-vertex-gemini
+          targetEndpoint: vertex-gemini-target
+
+  targetEndpoints:
+    - name: vertex-gemini-target
+      httpTargetConnection:
+        url: https://aiplatform.googleapis.com/v1/projects/{gcp_project_id}/locations/global/publishers/google/models/gemini-3.1-pro-preview:generateContent
+        authentication:
+          googleAccessToken:
+            scopes:
+              - https://www.googleapis.com/auth/cloud-platform
+        properties:
+          response.streaming.enabled: "false"
+          request.streaming.enabled: "false"
+          io.timeout.millis: "3600000"
+          keepalive.timeout.millis: "3600000"
+
+    - name: vertex-anthropic-target
+      httpTargetConnection:
+        url: https://aiplatform.googleapis.com/v1/projects/{gcp_project_id}/locations/global/publishers/anthropic/models/claude-sonnet-4-6:rawPredict
+        authentication:
+          googleAccessToken:
+            scopes:
+              - https://www.googleapis.com/auth/cloud-platform
+        properties:
+          response.streaming.enabled: "false"
+          request.streaming.enabled: "false"
+          io.timeout.millis: "3600000"
+          keepalive.timeout.millis: "3600000"
+
+    - name: vertex-openapi-maas-target
+      httpTargetConnection:
+        url: https://aiplatform.googleapis.com/v1/projects/{gcp_project_id}/locations/global/endpoints/openapi/chat/completions
+        authentication:
+          googleAccessToken:
+            scopes:
+              - https://www.googleapis.com/auth/cloud-platform
+        properties:
+          response.streaming.enabled: "false"
+          request.streaming.enabled: "false"
+          io.timeout.millis: "3600000"
+          keepalive.timeout.millis: "3600000"
+
+    - name: vertex-gemini-stream-target
+      httpTargetConnection:
+        url: https://aiplatform.googleapis.com/v1/projects/{gcp_project_id}/locations/global/publishers/google/models/gemini-3.1-pro-preview:streamGenerateContent?alt=sse
+        authentication:
+          googleAccessToken:
+            scopes:
+              - https://www.googleapis.com/auth/cloud-platform
+        properties:
+          response.streaming.enabled: "true"
+          request.streaming.enabled: "false"
+          io.timeout.millis: "3600000"
+          keepalive.timeout.millis: "3600000"
+
+    - name: vertex-anthropic-stream-target
+      httpTargetConnection:
+        url: https://aiplatform.googleapis.com/v1/projects/{gcp_project_id}/locations/global/publishers/anthropic/models/claude-sonnet-4-6:streamRawPredict
+        authentication:
+          googleAccessToken:
+            scopes:
+              - https://www.googleapis.com/auth/cloud-platform
+        properties:
+          response.streaming.enabled: "true"
+          request.streaming.enabled: "false"
+          io.timeout.millis: "3600000"
+          keepalive.timeout.millis: "3600000"
+
+    - name: vertex-openapi-maas-stream-target
+      httpTargetConnection:
+        url: https://aiplatform.googleapis.com/v1/projects/{gcp_project_id}/locations/global/endpoints/openapi/chat/completions
+        authentication:
+          googleAccessToken:
+            scopes:
+              - https://www.googleapis.com/auth/cloud-platform
+        properties:
+          response.streaming.enabled: "true"
+          request.streaming.enabled: "false"
+          io.timeout.millis: "3600000"
+          keepalive.timeout.millis: "3600000"

@@ -1,0 +1,84 @@
+# ==============================================================================
+# Feature: Native Apigee <LLMTokenQuota> Enforcement & Counting
+# Enforces per-developer / per-API-Product token budgets across both unary
+# responses (PostFlow) and live SSE streaming chunks (EventFlow).
+# ==============================================================================
+defaultParameters:
+  - name: DefaultTokenQuota
+    value: "5000000"
+  - name: DefaultTokenQuotaInterval
+    value: "1"
+  - name: DefaultTokenQuotaTimeUnit
+    value: "day"
+
+endpoints:
+  - name: default
+    preFlow:
+      request:
+        - name: LTQ-EnforceTokenBudget
+          condition: request.verb = "POST" and ai.isAntigravityTelemetry != "true"
+    postFlow:
+      response:
+        - name: LTQ-CountTokensUnary
+          condition: request.verb != "OPTIONS" and ai.totalTokenCount != null
+    eventFlow:
+      response:
+        - name: LTQ-CountTokensStream
+          condition: ai.streamTokenCount != null
+
+steps:
+  - name: LTQ-EnforceTokenBudget
+    type: LLMTokenQuota
+    properties:
+      sharedName: CodingAgentDeveloperTokenQuota
+      distributed: true
+      synchronous: true
+      enforceOnly: true
+      identifier: auth.developer_email
+      allow:
+        countRef: auth.llm_quota
+        defaultCount: "{DefaultTokenQuota}"
+      interval:
+        ref: verifyapikey.VA-VerifyApiKey.apiproduct.llmQuotaInterval
+        default: "{DefaultTokenQuotaInterval}"
+      timeUnit:
+        ref: verifyapikey.VA-VerifyApiKey.apiproduct.llmQuotaTimeUnit
+        default: "{DefaultTokenQuotaTimeUnit}"
+
+  - name: LTQ-CountTokensUnary
+    type: LLMTokenQuota
+    properties:
+      sharedName: CodingAgentDeveloperTokenQuota
+      distributed: true
+      synchronous: false
+      countOnly: true
+      identifier: auth.developer_email
+      llmTokenUsageSource: "{ai.totalTokenCount}"
+      allow:
+        countRef: auth.llm_quota
+        defaultCount: "{DefaultTokenQuota}"
+      interval:
+        ref: verifyapikey.VA-VerifyApiKey.apiproduct.llmQuotaInterval
+        default: "{DefaultTokenQuotaInterval}"
+      timeUnit:
+        ref: verifyapikey.VA-VerifyApiKey.apiproduct.llmQuotaTimeUnit
+        default: "{DefaultTokenQuotaTimeUnit}"
+
+  - name: LTQ-CountTokensStream
+    type: LLMTokenQuota
+    properties:
+      sharedName: CodingAgentDeveloperTokenQuota
+      distributed: true
+      synchronous: false
+      countOnly: true
+      identifier: auth.developer_email
+      llmTokenUsageSource: "{ai.streamTokenCount}"
+      allow:
+        countRef: auth.llm_quota
+        defaultCount: "{DefaultTokenQuota}"
+      interval:
+        ref: verifyapikey.VA-VerifyApiKey.apiproduct.llmQuotaInterval
+        default: "{DefaultTokenQuotaInterval}"
+      timeUnit:
+        ref: verifyapikey.VA-VerifyApiKey.apiproduct.llmQuotaTimeUnit
+        default: "{DefaultTokenQuotaTimeUnit}"

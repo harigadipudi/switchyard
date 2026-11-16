@@ -1,0 +1,27 @@
+build/
+node_modules/
+__pycache__/
+.DS_Store
+.env*
+*.key
+*.pem
+review.md
+.active_model
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+.terraform/
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local documentation & presentation deck
+docs/
+
